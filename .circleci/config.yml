@@ -110,19 +110,19 @@ jobs:
             npm install
             npm audit --audit-level=critical
 
-  scan-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          Keys: [backend-build]
-      - run:
-          name: scan backend for vulnerabilities
-          command: |
-            cd backend
-            npm install
-            npm audit --audit-level=critical
+  # scan-backend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         Keys: [backend-build]
+  #     - run:
+  #         name: scan backend for vulnerabilities
+  #         command: |
+  #           cd backend
+  #           npm install
+  #           npm audit --audit-level=critical
 
 #   deploy-infrastructure:
 #     docker:
@@ -299,8 +299,8 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
       # - deploy-infrastructure:
