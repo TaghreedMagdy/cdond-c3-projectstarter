@@ -48,22 +48,22 @@ jobs:
   #         paths: [frontend/node_modules]
   #         key: frontend-build
 
-  # build-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - run:
-  #         name: Back-end build
-  #         command: |
-  #           cd backend
-  #           npm install
-  #           npm run build
-  #     - save_cache:
-  #         paths: [backend/node_modules]
-  #         key: backend-build
+  build-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Back-end build
+          command: |
+            cd backend
+            npm install
+            npm run build
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build
 
   # test-frontend:
   #   docker:
@@ -108,19 +108,19 @@ jobs:
   #           npm install
   #           npm audit fix --audit-level=critical --force
 
-  # scan-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - run:
-  #         name: scan backend for vulnerabilities
-  #         command: |
-  #           cd backend
-  #           npm install
-  #           npm audit fix --audit-level=critical --force
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: scan backend for vulnerabilities
+          command: |
+            cd backend
+            npm install
+            npm audit fix --audit-level=critical --force
 
   # deploy-infrastructure:
   #   docker:
@@ -187,7 +187,7 @@ jobs:
 
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - run:
@@ -195,7 +195,6 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
 
       - run:
