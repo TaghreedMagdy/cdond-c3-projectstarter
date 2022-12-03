@@ -167,8 +167,6 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["cb:80:59:ab:df:99:e6:5b:4a:66:03:ce:c8:fd:42:1b"]
-      - attach_workspace:
-          at: project/.circleci/ansible/inventory.txt
       - run:
           name: Install dependencies
           command: |
@@ -178,6 +176,8 @@ jobs:
             unzip awscliv2.zip
             ./aws/install
             apk add --update ansible
+      - attach_workspace:
+          at: project/.circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
