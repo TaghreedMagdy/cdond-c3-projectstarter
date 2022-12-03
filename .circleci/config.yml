@@ -177,7 +177,7 @@ jobs:
             ./aws/install
             apk add --update ansible
       - attach_workspace:
-          at: project/.circleci/ansible/inventory.txt
+          at: ~/
       - run:
           name: Configure server
           command: |
