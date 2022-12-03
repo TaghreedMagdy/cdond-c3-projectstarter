@@ -195,7 +195,6 @@ jobs:
           command: |
             cd backend
             npm install
-#           The below command for separate running
             npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
 
