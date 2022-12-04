@@ -1,19 +1,49 @@
 ---
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+
+- name: "install dependencies."
+  become: yes
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
+- name: "install pm2"
+  become: yes
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
 - name: Creates directory
   file:
-    path: ~/web2
+    path: ~/web3
     state: directory
 
 
 - name: "extract zipped artifact"
   unarchive: 
     src: "files/artifact.tar.gz"
-    dest: "~/web2"
+    dest: "~/web3"
+
 
 - name: "Installing node"
   shell: |
-    cd ~/web2
+    cd ~/web3
     npm i
-    cd ~/web2/dist
     pm2 stop default
-    pm2 start main.js
+    pm2 start npm -- start
