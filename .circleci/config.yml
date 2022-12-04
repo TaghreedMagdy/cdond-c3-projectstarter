@@ -276,9 +276,6 @@ jobs:
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cp artifact.tar.gz .circleci/ansible/roles/deploy/files
-            export TYPEORM_MIGRATIONS_DIR = ./src/migrations
-            export TYPEORM_ENTITIES = ./src/modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS = ./migrations/*.ts
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
