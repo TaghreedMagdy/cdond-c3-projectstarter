@@ -220,6 +220,7 @@ jobs:
           command: |
             yum install -y tar gzip
             yum update -y
+            curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
             yum install -y nodejs
 
       - run:
@@ -316,12 +317,13 @@ workflows:
   default:
     jobs:
       - build-frontend
-      - deploy-infrastructure:
-          requires: [build-frontend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
       - deploy-frontend:
-          requires: [configure-infrastructure]
+          requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [build-frontend]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+
       # - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
