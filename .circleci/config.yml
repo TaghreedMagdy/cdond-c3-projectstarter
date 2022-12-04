@@ -376,7 +376,7 @@ workflows:
       #     requires: [run-migrations]
         - build-backend
         - deploy-infrastructure:
-            requires: [- build-backend]
+            requires: [build-backend]
         - deploy-backend:
             requires: [deploy-infrastructure]
       # - smoke-test:
