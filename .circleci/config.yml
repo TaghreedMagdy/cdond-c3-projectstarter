@@ -129,13 +129,13 @@ jobs:
       - checkout
       - run: yum install -y tar gzip
       - run:
-          # name: Ensure back-end infrastructure exists
-          # command: |
-          #   aws cloudformation deploy \
-          #   --template-file .circleci/files/backend.yml \
-          #   --tags project=udapeople \
-          #   --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-          #   --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -145,45 +145,45 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           aws ec2 describe-instances \
-  #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #           --output text >> ./.circleci/ansible/inventory.txt
-  #     - run: cat ./.circleci/ansible/inventory.txt
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
-  #     - destroy-environment     
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --output text >> ./.circleci/ansible/inventory.txt
+      - run: cat ./.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - destroy-environment     
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image:  python:3.7-alpine3.11    
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["cb:80:59:ab:df:99:e6:5b:4a:66:03:ce:c8:fd:42:1b"]
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --no-cache tar
-  #           apk --no-cache add curl
-  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  #           unzip awscliv2.zip
-  #           ./aws/install
-  #           apk add --update ansible
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           cd .circleci/ansible
-  #           cat inventory.txt
-  #           ansible-playbook -i inventory.txt configure-server.yml
+  configure-infrastructure:
+    docker:
+      - image:  python:3.7-alpine3.11    
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["cb:80:59:ab:df:99:e6:5b:4a:66:03:ce:c8:fd:42:1b"]
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache tar
+            apk --no-cache add curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+            apk add --update ansible
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
 
-  #     - destroy-environment  
+      - destroy-environment  
 
     #            yum install -y python3
             # yum install -y ansible  
@@ -318,8 +318,10 @@ workflows:
       - build-frontend
       - deploy-infrastructure:
           requires: [build-frontend]
-      - deploy-frontend:
+      - configure-infrastructure:
           requires: [deploy-infrastructure]
+      - deploy-frontend:
+          requires: [configure-infrastructure]
       # - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
