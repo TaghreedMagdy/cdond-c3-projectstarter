@@ -405,8 +405,6 @@ jobs:
             unzip awscliv2.zip
             ./aws/install
             apk add --update ansible
-            apk add --update nodejs npm
-            apk add --update npm
       - run:
           name: Add back-end ip to ansible inventory
           command: |
