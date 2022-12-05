@@ -339,14 +339,14 @@ jobs:
           root: .
           paths: 
             - textfile.txt        
-      # - run:
-      #     name: Update cloudfront distribution
-      #     command: |
-      #       aws cloudformation deploy \
-      #       --template-file .circleci/files/cloudfront.yml \
-      #       --stack-name InitialStack \
-      #       --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-      #       --tags project=udapeople
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            --tags project=udapeople
       # # - destroy-environment
       # # - revert-migrations
 
@@ -364,19 +364,15 @@ jobs:
             yum update -y
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
-      # - attach_workspace:
-      #     at: .
+      - attach_workspace:
+          at: .
       - run:
           name: Get old stack workflow id
-          #           # export OldWorkflowID=$(cat ./textfile.txt)
           command: |
+            export OldWorkflowID=$(cat ./textfile.txt)
             echo $OldWorkflowID
-            export STACKS=[]$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-                             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)
-            echo Stack names: "${STACKS[@]}"
-      - run:
-          name: Remove old stacks and files
-          command: |
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                             --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
             echo Stack names: "${STACKS[@]}"
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
@@ -392,43 +388,29 @@ jobs:
 workflows:
   default:
     jobs:
-      - cleanup
-      # - build-frontend
-      # - deploy-frontend:
-      #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [build-frontend]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - deploy-infrastructure
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      #  - run-migrations
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - build-backend
-      # - deploy-infrastructure:
-      #       requires: [build-backend]
-      # - deploy-backend:
-      #     requires: [deploy-infrastructure]
-      # - smoke-test
-          # requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
