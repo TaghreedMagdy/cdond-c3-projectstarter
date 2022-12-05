@@ -364,12 +364,12 @@ jobs:
             yum update -y
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
       - run:
           name: Get old stack workflow id
+          #           # export OldWorkflowID=$(cat ./textfile.txt)
           command: |
-            export OldWorkflowID=$(cat ./textfile.txt)
             echo $OldWorkflowID
             export STACKS=[]$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                              --stack-status-filter CREATE_COMPLETE --no-paginate --output text)
@@ -378,7 +378,7 @@ jobs:
           name: Remove old stacks and files
           command: |
             echo Stack names: "${STACKS[@]}"
-            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
+            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
@@ -392,9 +392,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - cloudfront-update
-      - cleanup:
-          requires: [cloudfront-update]
+      - cleanup
       # - build-frontend
       # - deploy-frontend:
       #     requires: [build-frontend]
