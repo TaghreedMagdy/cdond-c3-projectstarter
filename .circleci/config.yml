@@ -403,9 +403,7 @@ jobs:
             yum update -y
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
-            yum -y install epel-repo
-            yum update -y
-            yum -y install ansible
+            amazon-linux-extras install ansible2 -y
       - run:
           name: Add back-end ip to ansible inventory
           command: |
