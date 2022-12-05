@@ -448,5 +448,5 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
-        - install-exporter:
-            requires: [cleanup]
+      - install-exporter:
+          requires: [cleanup]
