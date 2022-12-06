@@ -414,17 +414,17 @@ jobs:
             ansible-playbook -i inventory.txt install-exporter.yml
 
   run-revert:
-   docker:
+    docker:
       - image: cimg/node:13.8.0
-  steps:
-    - checkout
-    - run:
-        name: install dependency
-        command:  |
-          cd backend
-          npm install
-    - run: return 1
-    - revert-migrations
+    steps:
+      - checkout
+      - run:
+          name: install dependency
+          command:  |
+            cd backend
+            npm install
+      - run: return 1
+      - revert-migrations
 
 
        
