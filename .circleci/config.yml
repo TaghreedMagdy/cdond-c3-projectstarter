@@ -23,9 +23,8 @@ commands:
       - run:
           name: Revert migrations
           When: on_fail
-#            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_<< parameters.workflow_id >>)
           command: |
-            SUCCESS = 1
+            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -413,36 +412,52 @@ jobs:
             cd ./.circleci/ansible/
             cat inventory.txt
             ansible-playbook -i inventory.txt install-exporter.yml
+
+  run-revert:
+   docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: install dependency
+          command:  |
+            cd backend
+            npm install
+      - run: return 1
+      - revert-migrations
+
+
        
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
+      - run-revert
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
