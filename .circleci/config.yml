@@ -23,8 +23,9 @@ commands:
       - run:
           name: Revert migrations
           When: on_fail
+#            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_<< parameters.workflow_id >>)
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_<< parameters.workflow_id >>)
+            SUCCESS = 1
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -316,7 +317,7 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              echo "worked fine"
+              failed
             else
               return 1
             fi
@@ -442,9 +443,9 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
-      - install-exporter:
-          requires: [cleanup]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]
+      # - install-exporter:
+      #     requires: [cleanup]
