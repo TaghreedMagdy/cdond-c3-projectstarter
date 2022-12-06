@@ -18,13 +18,13 @@ commands:
     parameters:
       workflow_id:
         type: string 
-        default: "${CIRCLE_WORKFLOW_ID:0:7}"
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"  
     steps:
       - run:
           name: Revert migrations
           When: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_)
+            SUCCESS=$(curl --insecure https://kvdb.io/SKwi1rMgjj3xezMRW4hiBM/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -199,6 +199,8 @@ jobs:
             cd backend
             npm install
             npm run migrations > migrations_dump.txt
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Send migration results to kvdb.io
           command: |
@@ -415,7 +417,7 @@ jobs:
 
   run-revert:
     docker:
-      - image: cimg/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
